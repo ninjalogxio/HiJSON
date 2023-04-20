@@ -40,7 +40,18 @@ public class JSONKeyEncoder {
     internal private(set) var container: Container
     
     internal init(encoder: Encoder, codingPath: [JSONCodingKey]) throws {
-        fatalError()
+        self.encoder = encoder
+        self.codingPath = codingPath
+        
+        container = .keyed(encoder.container(keyedBy: JSONCodingKey.self))
+        try zip(codingPath, codingPath.dropFirst()).forEach {
+            switch $0 {
+            case (let key, .index):
+                container = try container.nestedUnkeyedContainer(forKey: key)
+            case (let key, .key):
+                container = try container.nestedKeyedContainer(forKey: key)
+            }
+        }
     }
     
     internal func encode<T>(_ value: T) throws where T: Encodable {
