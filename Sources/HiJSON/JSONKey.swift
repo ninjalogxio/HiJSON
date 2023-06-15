@@ -13,7 +13,7 @@ private enum Value<Wrapped> {
 }
 
 @propertyWrapper
-public final class JSONKey<T> {
+public final class JSONKey<T>: CustomStringConvertible, CustomReflectable {
     
     internal let keyPath: KeyPath?
     
@@ -42,6 +42,14 @@ public final class JSONKey<T> {
     }
     
     private var _value: Value<T> = .undefined
+    
+    public var description: String {
+        String(describing: _value)
+    }
+    
+    public var customMirror: Mirror {
+        Mirror(reflecting: _value)
+    }
 }
 
 extension JSONKey: DecodablePropertyWrapper {
